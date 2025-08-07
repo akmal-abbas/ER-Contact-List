@@ -178,7 +178,7 @@
   }
 
   function saveToPDF() {
-    let html = `<h2>Emergency Response Checklist</h2><ul>`;
+    let html = `<h2>Emergency Response Coordinator Checklist</h2><ul>`;
     checklistItems.forEach((text, i) => {
       const checkbox = document.getElementById(`check${i}`);
       const remark = document.getElementById(`remark${i}`).value.trim();
@@ -191,7 +191,7 @@
     const printWindow = window.open('', '', 'width=800,height=800');
     printWindow.document.write(`
       <html>
-      <head><title>Checklist PDF</title></head>
+      <head><title>Emergency Response Coordinator Checklist PDF</title></head>
       <body>
         ${html}
         <script>
