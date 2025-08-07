@@ -98,16 +98,18 @@
     const checkboxId = `check${i}`;
     const remarkId = `remark${i}`;
 
-    // Create checkbox
     const label = document.createElement("label");
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.id = checkboxId;
-    checkbox.onchange = () => toggleRemark(checkbox, remarkDiv);
+    checkbox.onchange = () => {
+      localStorage.setItem(checkboxId, checkbox.checked);
+      toggleRemark(checkbox, remarkDiv);
+    };
+
     label.appendChild(checkbox);
     label.appendChild(document.createTextNode(text));
 
-    // Create remark textarea
     const remarkDiv = document.createElement("div");
     remarkDiv.className = "remark";
     const textarea = document.createElement("textarea");
@@ -123,11 +125,7 @@
   });
 
   function toggleRemark(checkbox, remarkDiv) {
-    if (checkbox.checked) {
-      remarkDiv.style.display = "block";
-    } else {
-      remarkDiv.style.display = "none";
-    }
+    remarkDiv.style.display = checkbox.checked ? "block" : "none";
   }
 
   window.onload = () => {
