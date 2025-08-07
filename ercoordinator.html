@@ -18,12 +18,24 @@
     }
     label {
       display: block;
-      margin: 10px 0;
+      margin: 10px 0 5px;
       font-size: 1rem;
     }
     input[type="checkbox"] {
       margin-right: 10px;
       transform: scale(1.2);
+    }
+    .remark {
+      display: none;
+      margin-bottom: 15px;
+    }
+    textarea {
+      width: 100%;
+      padding: 8px;
+      font-size: 0.95rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      resize: vertical;
     }
     .button-group {
       margin-top: 20px;
@@ -51,21 +63,52 @@
 <h1>Emergency Response Coordinator Checklist – Safety Senior Manager</h1>
 
 <form id="checklistForm">
-  <label><input type="checkbox" name="check" value="1. Report to EMC">1. Report to EMC upon notification of the ERP.</label>
-  <label><input type="checkbox" name="check" value="2. Activate EMC">2. Ensure EMC is activated and Status Board filled.</label>
-  <label><input type="checkbox" name="check" value="3. Verify CMT">3. Verify CMT members' attendance.</label>
-  <label><input type="checkbox" name="check" value="4. Attend briefing">4. Attend briefing from Divisions/Departments.</label>
-  <label><input type="checkbox" name="check" value="5. Use Appendix C">5. Use Appendix C from OCC to log activities.</label>
-  <label><input type="checkbox" name="check" value="6. EMC Comms">6. Establish EMC communications. Use emc@ascendairwaysmy.aero.</label>
-  <label><input type="checkbox" name="check" value="7. Confirm DMS">7. Confirm with EM and activate DMS.</label>
-  <label><input type="checkbox" name="check" value="8. Documentation">8. Distribute EM-approved documents to stakeholders.</label>
-  <label><input type="checkbox" name="check" value="9. Liaise with HR">9. HR to arrange Go Team travel & caregivers.</label>
-  <label><input type="checkbox" name="check" value="10. Update EM">10. Follow up with DMS and update EM regularly.</label>
-  <label><input type="checkbox" name="check" value="11. Update Status Board">11. Update victim/casualty counts on Status Board.</label>
-  <label><input type="checkbox" name="check" value="12. PMA Comms">12. Communicate with PMA / Go Team / DMS.</label>
-  <label><input type="checkbox" name="check" value="13. Refreshments">13. Arrange refreshments for EMC personnel.</label>
-  <label><input type="checkbox" name="check" value="14. Other Tasks">14. Carry out any tasks assigned by EM.</label>
+  <!-- Checklist Items -->
+  <div>
+    <label><input type="checkbox" onchange="toggleRemark(this)">1. Report to EMC upon notification of the ERP.</label>
+    <div class="remark"><textarea placeholder="Remark for Item 1..."></textarea></div>
 
+    <label><input type="checkbox" onchange="toggleRemark(this)">2. Ensure EMC is activated and Status Board filled.</label>
+    <div class="remark"><textarea placeholder="Remark for Item 2..."></textarea></div>
+
+    <label><input type="checkbox" onchange="toggleRemark(this)">3. Verify CMT members' attendance.</label>
+    <div class="remark"><textarea placeholder="Remark for Item 3..."></textarea></div>
+
+    <label><input type="checkbox" onchange="toggleRemark(this)">4. Attend briefing from Divisions/Departments.</label>
+    <div class="remark"><textarea placeholder="Remark for Item 4..."></textarea></div>
+
+    <label><input type="checkbox" onchange="toggleRemark(this)">5. Use Appendix C from OCC to log activities.</label>
+    <div class="remark"><textarea placeholder="Remark for Item 5..."></textarea></div>
+
+    <label><input type="checkbox" onchange="toggleRemark(this)">6. Establish EMC communications. Use emc@ascendairwaysmy.aero.</label>
+    <div class="remark"><textarea placeholder="Remark for Item 6..."></textarea></div>
+
+    <label><input type="checkbox" onchange="toggleRemark(this)">7. Confirm with EM and activate DMS.</label>
+    <div class="remark"><textarea placeholder="Remark for Item 7..."></textarea></div>
+
+    <label><input type="checkbox" onchange="toggleRemark(this)">8. Distribute EM-approved documents to stakeholders.</label>
+    <div class="remark"><textarea placeholder="Remark for Item 8..."></textarea></div>
+
+    <label><input type="checkbox" onchange="toggleRemark(this)">9. HR to arrange Go Team travel & caregivers.</label>
+    <div class="remark"><textarea placeholder="Remark for Item 9..."></textarea></div>
+
+    <label><input type="checkbox" onchange="toggleRemark(this)">10. Follow up with DMS and update EM regularly.</label>
+    <div class="remark"><textarea placeholder="Remark for Item 10..."></textarea></div>
+
+    <label><input type="checkbox" onchange="toggleRemark(this)">11. Update victim/casualty counts on Status Board.</label>
+    <div class="remark"><textarea placeholder="Remark for Item 11..."></textarea></div>
+
+    <label><input type="checkbox" onchange="toggleRemark(this)">12. Communicate with PMA / Go Team / DMS.</label>
+    <div class="remark"><textarea placeholder="Remark for Item 12..."></textarea></div>
+
+    <label><input type="checkbox" onchange="toggleRemark(this)">13. Arrange refreshments for EMC personnel.</label>
+    <div class="remark"><textarea placeholder="Remark for Item 13..."></textarea></div>
+
+    <label><input type="checkbox" onchange="toggleRemark(this)">14. Carry out any tasks assigned by EM.</label>
+    <div class="remark"><textarea placeholder="Remark for Item 14..."></textarea></div>
+  </div>
+
+  <!-- Buttons -->
   <div class="button-group">
     <button type="button" onclick="sendEmail()">📩 Submit via Email</button>
     <button type="button" onclick="saveToPDF()">💾 Save to PDF</button>
@@ -74,40 +117,53 @@
 </form>
 
 <script>
-  // Save checked boxes to localStorage
-  const form = document.getElementById('checklistForm');
-  const checkboxes = form.querySelectorAll('input[type="checkbox"]');
+  // Toggle remark visibility
+  function toggleRemark(checkbox) {
+    const remarkDiv = checkbox.parentElement.nextElementSibling;
+    if (remarkDiv && remarkDiv.classList.contains("remark")) {
+      remarkDiv.style.display = checkbox.checked ? "block" : "none";
+    }
+  }
 
-  // Restore saved state
+  // Save/restore checkbox states
+  const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  const form = document.getElementById('checklistForm');
+
   window.onload = () => {
     checkboxes.forEach((box, i) => {
       const saved = localStorage.getItem(`check${i}`);
-      if (saved === 'true') box.checked = true;
+      if (saved === 'true') {
+        box.checked = true;
+        toggleRemark(box);
+      }
     });
   };
 
-  // Save on change
   checkboxes.forEach((box, i) => {
     box.addEventListener('change', () => {
       localStorage.setItem(`check${i}`, box.checked);
     });
   });
 
-  // Clear saved progress
+  // Clear progress
   function clearProgress() {
     if (confirm("Clear all saved checklist progress?")) {
       checkboxes.forEach((box, i) => {
         localStorage.removeItem(`check${i}`);
         box.checked = false;
+        toggleRemark(box);
       });
     }
   }
 
-  // Email submission
+  // Email
   function sendEmail() {
     const checkedItems = [...checkboxes]
       .filter(box => box.checked)
-      .map(box => box.value)
+      .map((box, i) => {
+        const remark = box.parentElement.nextElementSibling.querySelector('textarea').value.trim();
+        return `${box.value}${remark ? " - Remark: " + remark : ""}`;
+      })
       .join('%0D%0A');
     const subject = 'Submitted: Emergency Coordinator Checklist';
     const email = 'emc@ascendairwaysmy.aero';
@@ -116,26 +172,29 @@
   }
 
   // Save to PDF
- function saveToPDF() {
-  const printWindow = window.open('', '', 'width=800,height=800');
-  const checkedItems = [...checkboxes]
-    .filter(box => box.checked)
-    .map(box => `<li>${box.value}</li>`)
-    .join('');
-  printWindow.document.write(`
-    <html>
-    <head><title>Checklist PDF</title></head>
-    <body>
-      <h2>Emergency Response Checklist</h2>
-      <ul>${checkedItems}</ul>
-      <script>
-        window.onload = function() { window.print(); };
-      <\/script>
-    </body>
-    </html>
-  `);
-  printWindow.document.close();
-}
+  function saveToPDF() {
+    const printWindow = window.open('', '', 'width=800,height=800');
+    const checkedItems = [...checkboxes]
+      .filter(box => box.checked)
+      .map((box, i) => {
+        const remark = box.parentElement.nextElementSibling.querySelector('textarea').value.trim();
+        return `<li>${box.value}${remark ? " - Remark: " + remark : ""}</li>`;
+      })
+      .join('');
+    printWindow.document.write(`
+      <html>
+      <head><title>Checklist PDF</title></head>
+      <body>
+        <h2>Emergency Response Checklist</h2>
+        <ul>${checkedItems}</ul>
+        <script>
+          window.onload = function() { window.print(); };
+        <\/script>
+      </body>
+      </html>
+    `);
+    printWindow.document.close();
+  }
 </script>
 
 </body>
