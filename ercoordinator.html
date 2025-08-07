@@ -63,12 +63,9 @@
 <h1>Emergency Response Coordinator Checklist – Safety Senior Manager</h1>
 
 <form id="checklistForm">
-  <!-- Checklist Items -->
   <div id="checklistContainer"></div>
 
-  <!-- Buttons -->
   <div class="button-group">
-    <button type="button" onclick="sendEmail()">📩 Submit via Email</button>
     <button type="button" onclick="saveToPDF()">💾 Save to PDF</button>
     <button type="button" onclick="clearProgress()">🗑️ Clear Saved Progress</button>
   </div>
@@ -161,7 +158,8 @@
         remarkDiv.style.display = "none";
       });
     }
-  } 
+  }
+
   function saveToPDF() {
     let html = `<h2>Emergency Response Coordinator Checklist</h2><ul>`;
     checklistItems.forEach((text, i) => {
