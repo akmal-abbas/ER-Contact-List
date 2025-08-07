@@ -161,22 +161,7 @@
         remarkDiv.style.display = "none";
       });
     }
-  }
-
-  function sendEmail() {
-    let body = "";
-    checklistItems.forEach((text, i) => {
-      const checkbox = document.getElementById(`check${i}`);
-      const remark = document.getElementById(`remark${i}`).value.trim();
-      if (checkbox.checked) {
-        body += `${text}${remark ? " - Remark: " + remark : ""}%0D%0A`;
-      }
-    });
-    const subject = 'Submitted: Emergency Coordinator Checklist';
-    const email = 'emc@ascendairwaysmy.aero';
-    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
-  }
-
+  } 
   function saveToPDF() {
     let html = `<h2>Emergency Response Coordinator Checklist</h2><ul>`;
     checklistItems.forEach((text, i) => {
