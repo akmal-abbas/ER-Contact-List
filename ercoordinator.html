@@ -3,11 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <title>Emergency Response Coordinator Checklist – Safety Senior Manager</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Arial; padding: 20px; }
-    h1 { color: darkred; }
-    label { display: block; margin: 10px 0; }
-    button { padding: 10px 20px; background: darkred; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+    h1 {
+      color: darkred;
+      font-size: 1.4em;
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin: 10px 0;
+      font-size: 1rem;
+    }
+    input[type="checkbox"] {
+      margin-right: 10px;
+      transform: scale(1.2);
+    }
+    .button-group {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+    button {
+      padding: 10px 20px;
+      background: darkred;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    button:hover {
+      background-color: #a60000;
+    }
   </style>
 </head>
 <body>
@@ -15,39 +51,89 @@
 <h1>Emergency Response Coordinator Checklist – Safety Senior Manager</h1>
 
 <form id="checklistForm">
-  <label><input type="checkbox" name="check" value="1. Report to EMC"> 1. Report to EMC upon notification of the ERP.</label>
-  <label><input type="checkbox" name="check" value="2. Activate EMC"> 2. Ensure EMC is fully activated and operational. Fill the Status Board.</label>
-  <label><input type="checkbox" name="check" value="3. Verify CMT"> 3. Verify CMT members' attendance.</label>
-  <label><input type="checkbox" name="check" value="4. Attend briefing"> 4. Attend briefing from relevant Divisions / Departments.</label>
-  <label><input type="checkbox" name="check" value="5. Use Appendix C"> 5. Use Appendix C from OCC to log activities.</label>
-  <label><input type="checkbox" name="check" value="6. Establish communications"> 6. Establish EMC communications link. Use emc@ascendairwaysmy.aero. Follow Lock-Down procedure.</label>
-  <label><input type="checkbox" name="check" value="7. Confirm DMS"> 7. Confirm with EM the DMS activation via Blake Emergency Services.</label>
-  <label><input type="checkbox" name="check" value="8. Documentation"> 8. Obtain and distribute EM-approved documents to authorities and stakeholders.</label>
-  <label><input type="checkbox" name="check" value="9. Liaise with HR"> 9. Liaise with HR for Go Team and NOK travel, caregiver volunteers, and briefings.</label>
-  <label><input type="checkbox" name="check" value="10. DMS update"> 10. Follow up with DMS and update EM regularly.</label>
-  <label><input type="checkbox" name="check" value="11. Update Status Board"> 11. Update the status board with latest counts and locations.</label>
-  <label><input type="checkbox" name="check" value="12. Communicate with PMA"> 12. Establish communication with PMA or through Go Team/DMS.</label>
-  <label><input type="checkbox" name="check" value="13. Arrange refreshments"> 13. Arrange refreshments for EMC personnel.</label>
-  <label><input type="checkbox" name="check" value="14. Other tasks"> 14. Carry out any other tasks assigned by the EM.</label>
+  <label><input type="checkbox" name="check" value="1. Report to EMC">1. Report to EMC upon notification of the ERP.</label>
+  <label><input type="checkbox" name="check" value="2. Activate EMC">2. Ensure EMC is activated and Status Board filled.</label>
+  <label><input type="checkbox" name="check" value="3. Verify CMT">3. Verify CMT members' attendance.</label>
+  <label><input type="checkbox" name="check" value="4. Attend briefing">4. Attend briefing from Divisions/Departments.</label>
+  <label><input type="checkbox" name="check" value="5. Use Appendix C">5. Use Appendix C from OCC to log activities.</label>
+  <label><input type="checkbox" name="check" value="6. EMC Comms">6. Establish EMC communications. Use emc@ascendairwaysmy.aero.</label>
+  <label><input type="checkbox" name="check" value="7. Confirm DMS">7. Confirm with EM and activate DMS.</label>
+  <label><input type="checkbox" name="check" value="8. Documentation">8. Distribute EM-approved documents to stakeholders.</label>
+  <label><input type="checkbox" name="check" value="9. Liaise with HR">9. HR to arrange Go Team travel & caregivers.</label>
+  <label><input type="checkbox" name="check" value="10. Update EM">10. Follow up with DMS and update EM regularly.</label>
+  <label><input type="checkbox" name="check" value="11. Update Status Board">11. Update victim/casualty counts on Status Board.</label>
+  <label><input type="checkbox" name="check" value="12. PMA Comms">12. Communicate with PMA / Go Team / DMS.</label>
+  <label><input type="checkbox" name="check" value="13. Refreshments">13. Arrange refreshments for EMC personnel.</label>
+  <label><input type="checkbox" name="check" value="14. Other Tasks">14. Carry out any tasks assigned by EM.</label>
 
-  <br><br>
-  <button type="button" onclick="sendEmail()">📩 Submit via Email</button>
+  <div class="button-group">
+    <button type="button" onclick="sendEmail()">📩 Submit via Email</button>
+    <button type="button" onclick="saveToPDF()">💾 Save to PDF</button>
+    <button type="button" onclick="clearProgress()">🗑️ Clear Saved Progress</button>
+  </div>
 </form>
 
 <script>
-function sendEmail() {
+  // Save checked boxes to localStorage
   const form = document.getElementById('checklistForm');
-  const checkedItems = [...form.elements['check']]
-    .filter(box => box.checked)
-    .map(box => box.value)
-    .join('%0D%0A'); // newline encoded for email body
+  const checkboxes = form.querySelectorAll('input[type="checkbox"]');
 
-  const subject = 'Submitted: Emergency Coordinator Checklist';
-  const email = 'emc@ascendairwaysmy.aero';
-  const mailtoLink = `mailto:${email}?subject=${subject}&body=${checkedItems}`;
+  // Restore saved state
+  window.onload = () => {
+    checkboxes.forEach((box, i) => {
+      const saved = localStorage.getItem(`check${i}`);
+      if (saved === 'true') box.checked = true;
+    });
+  };
 
-  window.location.href = mailtoLink;
-}
+  // Save on change
+  checkboxes.forEach((box, i) => {
+    box.addEventListener('change', () => {
+      localStorage.setItem(`check${i}`, box.checked);
+    });
+  });
+
+  // Clear saved progress
+  function clearProgress() {
+    if (confirm("Clear all saved checklist progress?")) {
+      checkboxes.forEach((box, i) => {
+        localStorage.removeItem(`check${i}`);
+        box.checked = false;
+      });
+    }
+  }
+
+  // Email submission
+  function sendEmail() {
+    const checkedItems = [...checkboxes]
+      .filter(box => box.checked)
+      .map(box => box.value)
+      .join('%0D%0A');
+    const subject = 'Submitted: Emergency Coordinator Checklist';
+    const email = 'emc@ascendairwaysmy.aero';
+    const mailtoLink = `mailto:${email}?subject=${subject}&body=${checkedItems}`;
+    window.location.href = mailtoLink;
+  }
+
+  // Save to PDF
+  function saveToPDF() {
+    const printWindow = window.open('', '', 'width=800,height=800');
+    const checkedItems = [...checkboxes]
+      .filter(box => box.checked)
+      .map(box => `<li>${box.value}</li>`)
+      .join('');
+    printWindow.document.write(`
+      <html>
+      <head><title>Checklist PDF</title></head>
+      <body>
+        <h2>Emergency Response Checklist</h2>
+        <ul>${checkedItems}</ul>
+        <script>window.onload = function() { window.print(); }</script>
+      </body>
+      </html>
+    `);
+    printWindow.document.close();
+  }
 </script>
 
 </body>
