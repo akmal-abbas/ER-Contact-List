@@ -64,49 +64,7 @@
 
 <form id="checklistForm">
   <!-- Checklist Items -->
-  <div>
-    <label><input type="checkbox" onchange="toggleRemark(this)">1. Report to EMC upon notification of the ERP.</label>
-    <div class="remark"><textarea placeholder="Remark for Item 1..."></textarea></div>
-
-    <label><input type="checkbox" onchange="toggleRemark(this)">2. Ensure EMC is activated and Status Board filled.</label>
-    <div class="remark"><textarea placeholder="Remark for Item 2..."></textarea></div>
-
-    <label><input type="checkbox" onchange="toggleRemark(this)">3. Verify CMT members' attendance.</label>
-    <div class="remark"><textarea placeholder="Remark for Item 3..."></textarea></div>
-
-    <label><input type="checkbox" onchange="toggleRemark(this)">4. Attend briefing from Divisions/Departments.</label>
-    <div class="remark"><textarea placeholder="Remark for Item 4..."></textarea></div>
-
-    <label><input type="checkbox" onchange="toggleRemark(this)">5. Use Appendix C from OCC to log activities.</label>
-    <div class="remark"><textarea placeholder="Remark for Item 5..."></textarea></div>
-
-    <label><input type="checkbox" onchange="toggleRemark(this)">6. Establish EMC communications. Use emc@ascendairwaysmy.aero.</label>
-    <div class="remark"><textarea placeholder="Remark for Item 6..."></textarea></div>
-
-    <label><input type="checkbox" onchange="toggleRemark(this)">7. Confirm with EM and activate DMS.</label>
-    <div class="remark"><textarea placeholder="Remark for Item 7..."></textarea></div>
-
-    <label><input type="checkbox" onchange="toggleRemark(this)">8. Distribute EM-approved documents to stakeholders.</label>
-    <div class="remark"><textarea placeholder="Remark for Item 8..."></textarea></div>
-
-    <label><input type="checkbox" onchange="toggleRemark(this)">9. HR to arrange Go Team travel & caregivers.</label>
-    <div class="remark"><textarea placeholder="Remark for Item 9..."></textarea></div>
-
-    <label><input type="checkbox" onchange="toggleRemark(this)">10. Follow up with DMS and update EM regularly.</label>
-    <div class="remark"><textarea placeholder="Remark for Item 10..."></textarea></div>
-
-    <label><input type="checkbox" onchange="toggleRemark(this)">11. Update victim/casualty counts on Status Board.</label>
-    <div class="remark"><textarea placeholder="Remark for Item 11..."></textarea></div>
-
-    <label><input type="checkbox" onchange="toggleRemark(this)">12. Communicate with PMA / Go Team / DMS.</label>
-    <div class="remark"><textarea placeholder="Remark for Item 12..."></textarea></div>
-
-    <label><input type="checkbox" onchange="toggleRemark(this)">13. Arrange refreshments for EMC personnel.</label>
-    <div class="remark"><textarea placeholder="Remark for Item 13..."></textarea></div>
-
-    <label><input type="checkbox" onchange="toggleRemark(this)">14. Carry out any tasks assigned by EM.</label>
-    <div class="remark"><textarea placeholder="Remark for Item 14..."></textarea></div>
-  </div>
+  <div id="checklistContainer"></div>
 
   <!-- Buttons -->
   <div class="button-group">
@@ -117,76 +75,127 @@
 </form>
 
 <script>
-  // Toggle remark visibility
-  function toggleRemark(checkbox) {
-    const remarkDiv = checkbox.parentElement.nextElementSibling;
-    if (remarkDiv && remarkDiv.classList.contains("remark")) {
-      remarkDiv.style.display = checkbox.checked ? "block" : "none";
+  const checklistItems = [
+    "1. Report to EMC upon notification of the ERP.",
+    "2. Ensure EMC is activated and Status Board filled.",
+    "3. Verify CMT members' attendance.",
+    "4. Attend briefing from Divisions/Departments.",
+    "5. Use Appendix C from OCC to log activities.",
+    "6. Establish EMC communications. Use emc@ascendairwaysmy.aero.",
+    "7. Confirm with EM and activate DMS.",
+    "8. Distribute EM-approved documents to stakeholders.",
+    "9. HR to arrange Go Team travel & caregivers.",
+    "10. Follow up with DMS and update EM regularly.",
+    "11. Update victim/casualty counts on Status Board.",
+    "12. Communicate with PMA / Go Team / DMS.",
+    "13. Arrange refreshments for EMC personnel.",
+    "14. Carry out any tasks assigned by EM."
+  ];
+
+  const checklistContainer = document.getElementById("checklistContainer");
+
+  checklistItems.forEach((text, i) => {
+    const checkboxId = `check${i}`;
+    const remarkId = `remark${i}`;
+
+    // Create checkbox
+    const label = document.createElement("label");
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.id = checkboxId;
+    checkbox.onchange = () => toggleRemark(checkbox, remarkDiv);
+    label.appendChild(checkbox);
+    label.appendChild(document.createTextNode(text));
+
+    // Create remark textarea
+    const remarkDiv = document.createElement("div");
+    remarkDiv.className = "remark";
+    const textarea = document.createElement("textarea");
+    textarea.placeholder = `Remark for Item ${i + 1}...`;
+    textarea.id = remarkId;
+    textarea.oninput = () => {
+      localStorage.setItem(remarkId, textarea.value);
+    };
+    remarkDiv.appendChild(textarea);
+
+    checklistContainer.appendChild(label);
+    checklistContainer.appendChild(remarkDiv);
+  });
+
+  function toggleRemark(checkbox, remarkDiv) {
+    if (checkbox.checked) {
+      remarkDiv.style.display = "block";
+    } else {
+      remarkDiv.style.display = "none";
     }
   }
 
-  // Save/restore checkbox states
-  const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-  const form = document.getElementById('checklistForm');
-
   window.onload = () => {
-    checkboxes.forEach((box, i) => {
-      const saved = localStorage.getItem(`check${i}`);
-      if (saved === 'true') {
-        box.checked = true;
-        toggleRemark(box);
+    checklistItems.forEach((_, i) => {
+      const checkbox = document.getElementById(`check${i}`);
+      const remark = document.getElementById(`remark${i}`);
+      const remarkDiv = remark.parentElement;
+
+      const savedCheck = localStorage.getItem(`check${i}`);
+      const savedRemark = localStorage.getItem(`remark${i}`);
+
+      if (savedCheck === "true") {
+        checkbox.checked = true;
+        remarkDiv.style.display = "block";
+      }
+
+      if (savedRemark) {
+        remark.value = savedRemark;
       }
     });
   };
 
-  checkboxes.forEach((box, i) => {
-    box.addEventListener('change', () => {
-      localStorage.setItem(`check${i}`, box.checked);
-    });
-  });
-
-  // Clear progress
   function clearProgress() {
     if (confirm("Clear all saved checklist progress?")) {
-      checkboxes.forEach((box, i) => {
+      checklistItems.forEach((_, i) => {
         localStorage.removeItem(`check${i}`);
-        box.checked = false;
-        toggleRemark(box);
+        localStorage.removeItem(`remark${i}`);
+        const checkbox = document.getElementById(`check${i}`);
+        const remark = document.getElementById(`remark${i}`);
+        const remarkDiv = remark.parentElement;
+        checkbox.checked = false;
+        remark.value = "";
+        remarkDiv.style.display = "none";
       });
     }
   }
 
-  // Email
   function sendEmail() {
-    const checkedItems = [...checkboxes]
-      .filter(box => box.checked)
-      .map((box, i) => {
-        const remark = box.parentElement.nextElementSibling.querySelector('textarea').value.trim();
-        return `${box.value}${remark ? " - Remark: " + remark : ""}`;
-      })
-      .join('%0D%0A');
+    let body = "";
+    checklistItems.forEach((text, i) => {
+      const checkbox = document.getElementById(`check${i}`);
+      const remark = document.getElementById(`remark${i}`).value.trim();
+      if (checkbox.checked) {
+        body += `${text}${remark ? " - Remark: " + remark : ""}%0D%0A`;
+      }
+    });
     const subject = 'Submitted: Emergency Coordinator Checklist';
     const email = 'emc@ascendairwaysmy.aero';
-    const mailtoLink = `mailto:${email}?subject=${subject}&body=${checkedItems}`;
-    window.location.href = mailtoLink;
+    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
   }
 
-  // Save to PDF
   function saveToPDF() {
+    let html = `<h2>Emergency Response Checklist</h2><ul>`;
+    checklistItems.forEach((text, i) => {
+      const checkbox = document.getElementById(`check${i}`);
+      const remark = document.getElementById(`remark${i}`).value.trim();
+      if (checkbox.checked) {
+        html += `<li>${text}${remark ? " - Remark: " + remark : ""}</li>`;
+      }
+    });
+    html += `</ul>`;
+
     const printWindow = window.open('', '', 'width=800,height=800');
-    const checkedItems = [...checkboxes]
-      .filter(box => box.checked)
-      .map((box, i) => {
-        const remark = box.parentElement.nextElementSibling.querySelector('textarea').value.trim();
-        return `<li>${box.value}${remark ? " - Remark: " + remark : ""}</li>`;
-      })
-      .join('');
     printWindow.document.write(`
       <html>
       <head><title>Checklist PDF</title></head>
       <body>
-        <h2>Emergency Response Checklist</h2>
-        <ul>${checkedItems}</ul>
+        ${html}
         <script>
           window.onload = function() { window.print(); };
         <\/script>
