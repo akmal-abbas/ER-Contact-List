@@ -116,24 +116,26 @@
   }
 
   // Save to PDF
-  function saveToPDF() {
-    const printWindow = window.open('', '', 'width=800,height=800');
-    const checkedItems = [...checkboxes]
-      .filter(box => box.checked)
-      .map(box => `<li>${box.value}</li>`)
-      .join('');
-    printWindow.document.write(`
-      <html>
-      <head><title>Checklist PDF</title></head>
-      <body>
-        <h2>Emergency Response Checklist</h2>
-        <ul>${checkedItems}</ul>
-        <script>window.onload = function() { window.print(); }</script>
-      </body>
-      </html>
-    `);
-    printWindow.document.close();
-  }
+ function saveToPDF() {
+  const printWindow = window.open('', '', 'width=800,height=800');
+  const checkedItems = [...checkboxes]
+    .filter(box => box.checked)
+    .map(box => `<li>${box.value}</li>`)
+    .join('');
+  printWindow.document.write(`
+    <html>
+    <head><title>Checklist PDF</title></head>
+    <body>
+      <h2>Emergency Response Checklist</h2>
+      <ul>${checkedItems}</ul>
+      <script>
+        window.onload = function() { window.print(); };
+      <\/script>
+    </body>
+    </html>
+  `);
+  printWindow.document.close();
+}
 </script>
 
 </body>
